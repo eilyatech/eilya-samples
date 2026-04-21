@@ -63,8 +63,8 @@ dependencies {
 
 ### iOS (Swift Package Manager)
 In Xcode → File → Add Package Dependencies:
-- `https://github.com/MohsenAbdelkareem/eilya-otp` (version 1.0.0)
-- `https://github.com/MohsenAbdelkareem/eilya-chat` (version 1.0.0)
+- `https://github.com/eilyatech/eilya-otp` (version 1.0.0)
+- `https://github.com/eilyatech/eilya-chat` (version 1.0.0)
 
 ### Flutter (pub.dev)
 ```yaml

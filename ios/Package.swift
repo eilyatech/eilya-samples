@@ -8,8 +8,8 @@ let package = Package(
         .iOS(.v15),
     ],
     dependencies: [
-        .package(url: "https://github.com/MohsenAbdelkareem/eilya-otp.git", from: "1.0.0"),
-        .package(url: "https://github.com/MohsenAbdelkareem/eilya-chat.git", from: "1.0.0"),
+        .package(url: "https://github.com/eilyatech/eilya-otp.git", from: "1.0.0"),
+        .package(url: "https://github.com/eilyatech/eilya-chat.git", from: "1.0.0"),
     ],
     targets: [
         .executableTarget(
