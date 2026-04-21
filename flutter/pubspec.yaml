@@ -1,0 +1,16 @@
+name: eilya_sample
+description: Sample app demonstrating Eilya OTP and Chat SDKs.
+version: 1.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  eilya_otp: ^1.0.0
+  eilya_chat: ^1.0.0
+
+flutter:
+  uses-material-design: true

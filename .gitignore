@@ -1,0 +1,29 @@
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+
+# iOS
+ios/.build/
+ios/.swiftpm/
+*.xcodeproj
+*.xcworkspace
+
+# Flutter
+flutter/.dart_tool/
+flutter/.packages
+flutter/build/
+flutter/pubspec.lock
+flutter/.flutter-plugins
+flutter/.flutter-plugins-dependencies
+
+# macOS
+._*
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+.vscode/
