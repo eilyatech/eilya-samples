@@ -13,6 +13,7 @@ struct ContentView: View {
     // Chat state
     @State private var chatMessage = ""
     @State private var chatStatus = ""
+    @State private var hasSession = false
 
     var body: some View {
         ScrollView {
@@ -103,7 +104,7 @@ struct ContentView: View {
         otpStatus = "Sending OTP..."
 
         do {
-            let pipeline = try await EilyaOTP.requestOtp(phone: phone)
+            let pipeline = try await EilyaOtp.shared.requestOTP(phone: phone)
             pipelineId = pipeline.pipelineId
             otpStatus = "OTP sent via \(pipeline.channelUsed)\nPipeline: \(pipeline.pipelineId)"
             showVerify = true
@@ -120,7 +121,7 @@ struct ContentView: View {
         otpStatus = "Verifying..."
 
         do {
-            let result = try await EilyaOTP.verifyOtp(pipelineId: pid, code: otpCode)
+            let result = try await EilyaOtp.shared.verifyOTP(pipelineId: pid, otp: otpCode)
             otpStatus = "Verified!\nToken: \(result.authToken)\nPhone: \(result.phone)"
         } catch {
             otpStatus = "Failed: \(error.localizedDescription)"
@@ -139,7 +140,13 @@ struct ContentView: View {
         chatStatus = "Sending..."
 
         do {
-            let reply = try await EilyaChat.sendMessage(content: msg)
+            // Create session if not exists
+            if !hasSession {
+                _ = try await EilyaChat.shared.createSession()
+                hasSession = true
+            }
+
+            let reply = try await EilyaChat.shared.sendMessage(msg)
             chatStatus = "You: \(msg)\n\nBot: \(reply.content)"
         } catch {
             chatStatus = "Error: \(error.localizedDescription)"
@@ -152,15 +159,11 @@ struct ContentView: View {
 @main
 struct EilyaSampleApp: App {
     init() {
-        // Initialize Eilya OTP
-        EilyaOTP.initialize(
-            apiKey: "ek_test_your_api_key_here" // Replace with your API key
-        )
+        // Initialize Eilya OTP — replace with your API key
+        EilyaOtp.shared.configure(apiKey: "ek_test_your_api_key_here")
 
-        // Initialize Eilya Chat
-        EilyaChat.initialize(
-            apiKey: "ec_test_your_api_key_here" // Replace with your API key
-        )
+        // Initialize Eilya Chat — replace with your API key
+        EilyaChat.shared.configure(apiKey: "eck_test_your_api_key_here")
     }
 
     var body: some Scene {

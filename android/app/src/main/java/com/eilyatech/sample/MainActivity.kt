@@ -34,17 +34,20 @@ class MainActivity : AppCompatActivity() {
             ),
         )
 
-        // ─── Initialize Eilya Chat SDK ───────────────��────────────────────
+        // ─── Initialize Eilya Chat SDK ────────────────────────────────────
         EilyaChat.init(
             context = this,
-            apiKey = "ec_test_your_api_key_here", // Replace with your API key
-            config = EilyaChatConfig(
-                widgetTitle = "Eilya Support",
-                primaryColor = "#7C3AED",
-            ),
+            apiKey = "eck_test_your_api_key_here", // Replace with your API key
+            config = EilyaChatConfig(),
         )
 
-        // ─── OTP: Request ─────────────────────────────────────────────────
+        setupOtp()
+        setupChat()
+    }
+
+    // ── OTP ──────────────────────────────────────────────────────────────
+
+    private fun setupOtp() {
         binding.btnRequestOtp.setOnClickListener {
             val phone = binding.inputPhone.text.toString().trim()
             if (phone.isEmpty()) {
@@ -56,21 +59,21 @@ class MainActivity : AppCompatActivity() {
                 binding.btnRequestOtp.isEnabled = false
                 binding.txtOtpStatus.text = "Sending OTP..."
 
-                val result = EilyaOtp.requestOtp(phone)
-
-                result.onSuccess { pipeline ->
-                    currentPipelineId = pipeline.pipelineId
-                    binding.txtOtpStatus.text = "OTP sent via ${pipeline.channelUsed}\nPipeline: ${pipeline.pipelineId}"
-                    binding.layoutVerify.visibility = android.view.View.VISIBLE
-                }.onFailure { error ->
-                    binding.txtOtpStatus.text = "Error: ${error.message}"
-                }
+                EilyaOtp.requestOtp(phone)
+                    .onSuccess { pipeline ->
+                        currentPipelineId = pipeline.pipelineId
+                        binding.txtOtpStatus.text =
+                            "OTP sent via ${pipeline.channelUsed}\nPipeline: ${pipeline.pipelineId}"
+                        binding.layoutVerify.visibility = android.view.View.VISIBLE
+                    }
+                    .onFailure { error ->
+                        binding.txtOtpStatus.text = "Error: ${error.message}"
+                    }
 
                 binding.btnRequestOtp.isEnabled = true
             }
         }
 
-        // ─── OTP: Verify ────────────���───────────────────────────────���─────
         binding.btnVerifyOtp.setOnClickListener {
             val code = binding.inputOtpCode.text.toString().trim()
             val pipelineId = currentPipelineId
@@ -84,19 +87,23 @@ class MainActivity : AppCompatActivity() {
                 binding.btnVerifyOtp.isEnabled = false
                 binding.txtOtpStatus.text = "Verifying..."
 
-                val result = EilyaOtp.verifyOtp(pipelineId, code)
-
-                result.onSuccess { verifyResult ->
-                    binding.txtOtpStatus.text = "Verified!\nToken: ${verifyResult.authToken}\nPhone: ${verifyResult.phone}"
-                }.onFailure { error ->
-                    binding.txtOtpStatus.text = "Verification failed: ${error.message}"
-                }
+                EilyaOtp.verifyOtp(pipelineId, code)
+                    .onSuccess { result ->
+                        binding.txtOtpStatus.text =
+                            "Verified!\nToken: ${result.authToken}\nPhone: ${result.phone}"
+                    }
+                    .onFailure { error ->
+                        binding.txtOtpStatus.text = "Failed: ${error.message}"
+                    }
 
                 binding.btnVerifyOtp.isEnabled = true
             }
         }
+    }
 
-        // ─── Chat: Send Message ───────────────────────────────────────────
+    // ── Chat ─────────────────────────────────────────────────────────────
+
+    private fun setupChat() {
         binding.btnSendChat.setOnClickListener {
             val message = binding.inputChatMessage.text.toString().trim()
             if (message.isEmpty()) {
@@ -108,14 +115,26 @@ class MainActivity : AppCompatActivity() {
                 binding.btnSendChat.isEnabled = false
                 binding.txtChatStatus.text = "Sending..."
 
-                val result = EilyaChat.sendMessage(message)
-
-                result.onSuccess { reply ->
-                    binding.txtChatStatus.text = "You: $message\n\nBot: ${reply.content}"
-                    binding.inputChatMessage.text?.clear()
-                }.onFailure { error ->
-                    binding.txtChatStatus.text = "Error: ${error.message}"
+                // Create session if not exists
+                if (EilyaChat.currentSession == null) {
+                    val sessionResult = EilyaChat.createSession()
+                    if (sessionResult.isFailure) {
+                        binding.txtChatStatus.text =
+                            "Session error: ${sessionResult.exceptionOrNull()?.message}"
+                        binding.btnSendChat.isEnabled = true
+                        return@launch
+                    }
                 }
+
+                EilyaChat.sendMessage(message)
+                    .onSuccess { reply ->
+                        binding.txtChatStatus.text =
+                            "You: $message\n\nBot: ${reply.content}"
+                        binding.inputChatMessage.text?.clear()
+                    }
+                    .onFailure { error ->
+                        binding.txtChatStatus.text = "Error: ${error.message}"
+                    }
 
                 binding.btnSendChat.isEnabled = true
             }

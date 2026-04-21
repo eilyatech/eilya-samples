@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:eilya_otp/eilya_otp.dart';
 import 'package:eilya_chat/eilya_chat.dart';
 
-void main() {
-  // Initialize Eilya SDKs
-  EilyaOtp.init(apiKey: 'ek_test_your_api_key_here'); // Replace with your API key
-  EilyaChat.init(apiKey: 'ec_test_your_api_key_here'); // Replace with your API key
+// ── Replace these with your actual API keys ──────────────────────
+const otpApiKey = 'ek_test_your_api_key_here';
+const chatApiKey = 'eck_test_your_api_key_here';
+// ─────────────────────────────────────────────────────────────────
 
+void main() {
   runApp(const EilyaSampleApp());
 }
 
@@ -34,6 +35,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // SDK instances
+  late final EilyaOtp _otp;
+  late final EilyaChat _chat;
+
   // OTP state
   final _phoneController = TextEditingController();
   final _otpCodeController = TextEditingController();
@@ -44,6 +49,18 @@ class _HomePageState extends State<HomePage> {
   // Chat state
   final _chatController = TextEditingController();
   String _chatStatus = '';
+  String? _sessionId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize Eilya OTP SDK
+    _otp = EilyaOtp.initialize(apiKey: otpApiKey);
+
+    // Initialize Eilya Chat SDK
+    _chat = EilyaChat.initialize(apiKey: chatApiKey);
+  }
 
   // ── OTP: Request ───────────────────────────────────────────────
 
@@ -57,10 +74,11 @@ class _HomePageState extends State<HomePage> {
     setState(() => _otpStatus = 'Sending OTP...');
 
     try {
-      final pipeline = await EilyaOtp.requestOtp(phone: phone);
+      final pipeline = await _otp.requestOtp(phone: phone);
       setState(() {
         _pipelineId = pipeline.pipelineId;
-        _otpStatus = 'OTP sent via ${pipeline.channelUsed}\nPipeline: ${pipeline.pipelineId}';
+        _otpStatus =
+            'OTP sent via ${pipeline.channelUsed}\nPipeline: ${pipeline.pipelineId}';
         _showVerify = true;
       });
     } catch (e) {
@@ -80,12 +98,13 @@ class _HomePageState extends State<HomePage> {
     setState(() => _otpStatus = 'Verifying...');
 
     try {
-      final result = await EilyaOtp.verifyOtp(
+      final result = await _otp.verifyOtp(
         pipelineId: _pipelineId!,
-        code: code,
+        otp: code,
       );
       setState(() {
-        _otpStatus = 'Verified!\nToken: ${result.authToken}\nPhone: ${result.phone}';
+        _otpStatus =
+            'Verified!\nToken: ${result.authToken}\nPhone: ${result.phone}';
       });
     } catch (e) {
       setState(() => _otpStatus = 'Failed: $e');
@@ -105,7 +124,16 @@ class _HomePageState extends State<HomePage> {
     setState(() => _chatStatus = 'Sending...');
 
     try {
-      final reply = await EilyaChat.sendMessage(content: message);
+      // Create session if not exists
+      if (_sessionId == null) {
+        final session = await _chat.createSession();
+        _sessionId = session.sessionId;
+      }
+
+      final reply = await _chat.sendMessage(
+        sessionId: _sessionId!,
+        content: message,
+      );
       setState(() => _chatStatus = 'You: $message\n\nBot: ${reply.content}');
     } catch (e) {
       setState(() => _chatStatus = 'Error: $e');
@@ -123,7 +151,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             // ── OTP Section ──────────────────────────────────
             Text('OTP Verification',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.purple)),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple)),
             const SizedBox(height: 12),
 
             TextField(
@@ -141,7 +172,8 @@ class _HomePageState extends State<HomePage> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _requestOtp,
-                style: FilledButton.styleFrom(backgroundColor: Colors.purple),
+                style:
+                    FilledButton.styleFrom(backgroundColor: Colors.purple),
                 child: const Text('Request OTP'),
               ),
             ),
@@ -163,7 +195,8 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: _verifyOtp,
-                    style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                    style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green),
                     child: const Text('Verify'),
                   ),
                 ],
@@ -172,7 +205,11 @@ class _HomePageState extends State<HomePage> {
             ],
 
             if (_otpStatus.isNotEmpty)
-              Text(_otpStatus, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontFamily: 'monospace')),
+              Text(_otpStatus,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontFamily: 'monospace')),
 
             const SizedBox(height: 32),
             const Divider(),
@@ -180,7 +217,10 @@ class _HomePageState extends State<HomePage> {
 
             // ── Chat Section ─────────────────────────────────
             Text('AI Chat',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue)),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue)),
             const SizedBox(height: 12),
 
             Row(
@@ -198,7 +238,8 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: _sendChat,
-                  style: FilledButton.styleFrom(backgroundColor: Colors.blue),
+                  style:
+                      FilledButton.styleFrom(backgroundColor: Colors.blue),
                   child: const Text('Send'),
                 ),
               ],
@@ -206,7 +247,11 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 8),
 
             if (_chatStatus.isNotEmpty)
-              Text(_chatStatus, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontFamily: 'monospace')),
+              Text(_chatStatus,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontFamily: 'monospace')),
           ],
         ),
       ),
@@ -218,6 +263,8 @@ class _HomePageState extends State<HomePage> {
     _phoneController.dispose();
     _otpCodeController.dispose();
     _chatController.dispose();
+    _otp.dispose();
+    _chat.dispose();
     super.dispose();
   }
 }
