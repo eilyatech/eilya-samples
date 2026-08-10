@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         // ─── Initialize Eilya OTP SDK ─────────────────────────────────────
         EilyaOtp.init(
             context = this,
-            apiKey = "ek_test_your_api_key_here", // Replace with your API key
+            apiKey = BuildConfig.EILYA_OTP_API_KEY,
             config = EilyaOtpConfig(
                 locale = Locale.AR,
                 otpLength = OtpLength.SIX,
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         // ─── Initialize Eilya Chat SDK ────────────────────────────────────
         EilyaChat.init(
             context = this,
-            apiKey = "eck_test_your_api_key_here", // Replace with your API key
+            embedToken = BuildConfig.EILYA_CHAT_EMBED_TOKEN,
             config = EilyaChatConfig(),
         )
 
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                 EilyaOtp.verifyOtp(pipelineId, code)
                     .onSuccess { result ->
                         binding.txtOtpStatus.text =
-                            "Verified!\nToken: ${result.authToken}\nPhone: ${result.phone}"
+                            "Verified successfully\nPhone: ${result.phone}"
                     }
                     .onFailure { error ->
                         binding.txtOtpStatus.text = "Failed: ${error.message}"

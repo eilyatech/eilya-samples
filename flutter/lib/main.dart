@@ -3,8 +3,14 @@ import 'package:eilya_otp/eilya_otp.dart';
 import 'package:eilya_chat/eilya_chat.dart';
 
 // ── Replace these with your actual API keys ──────────────────────
-const otpApiKey = 'ek_test_your_api_key_here';
-const chatApiKey = 'eck_test_your_api_key_here';
+const otpApiKey = String.fromEnvironment(
+  'EILYA_OTP_API_KEY',
+  defaultValue: 'ek_test_000000000000000000000000000000000000000000000000',
+);
+const chatEmbedToken = String.fromEnvironment(
+  'EILYA_CHAT_EMBED_TOKEN',
+  defaultValue: 'ew_000000000000000000000000000000000000000000000000',
+);
 // ─────────────────────────────────────────────────────────────────
 
 void main() {
@@ -59,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     _otp = EilyaOtp.initialize(apiKey: otpApiKey);
 
     // Initialize Eilya Chat SDK
-    _chat = EilyaChat.initialize(apiKey: chatApiKey);
+    _chat = EilyaChat.initialize(embedToken: chatEmbedToken);
   }
 
   // ── OTP: Request ───────────────────────────────────────────────
@@ -103,8 +109,7 @@ class _HomePageState extends State<HomePage> {
         otp: code,
       );
       setState(() {
-        _otpStatus =
-            'Verified!\nToken: ${result.authToken}\nPhone: ${result.phone}';
+        _otpStatus = 'Verified successfully\nPhone: ${result.phone}';
       });
     } catch (e) {
       setState(() => _otpStatus = 'Failed: $e');
@@ -172,8 +177,7 @@ class _HomePageState extends State<HomePage> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _requestOtp,
-                style:
-                    FilledButton.styleFrom(backgroundColor: Colors.purple),
+                style: FilledButton.styleFrom(backgroundColor: Colors.purple),
                 child: const Text('Request OTP'),
               ),
             ),
@@ -195,8 +199,8 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: _verifyOtp,
-                    style: FilledButton.styleFrom(
-                        backgroundColor: Colors.green),
+                    style:
+                        FilledButton.styleFrom(backgroundColor: Colors.green),
                     child: const Text('Verify'),
                   ),
                 ],
@@ -238,8 +242,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: _sendChat,
-                  style:
-                      FilledButton.styleFrom(backgroundColor: Colors.blue),
+                  style: FilledButton.styleFrom(backgroundColor: Colors.blue),
                   child: const Text('Send'),
                 ),
               ],

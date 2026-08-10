@@ -13,6 +13,21 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
+
+        val otpApiKey = providers.gradleProperty("EILYA_OTP_API_KEY")
+            .orElse(providers.environmentVariable("EILYA_OTP_API_KEY"))
+            .orElse("ek_test_${"0".repeat(48)}")
+            .get()
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+        val chatEmbedToken = providers.gradleProperty("EILYA_CHAT_EMBED_TOKEN")
+            .orElse(providers.environmentVariable("EILYA_CHAT_EMBED_TOKEN"))
+            .orElse("ew_${"0".repeat(48)}")
+            .get()
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+        buildConfigField("String", "EILYA_OTP_API_KEY", "\"$otpApiKey\"")
+        buildConfigField("String", "EILYA_CHAT_EMBED_TOKEN", "\"$chatEmbedToken\"")
     }
 
     compileOptions {
@@ -26,6 +41,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -37,7 +53,7 @@ repositories {
 dependencies {
     // Eilya SDKs
     implementation("com.eilyatech:eilya-otp-android:1.0.0")
-    implementation("com.eilyatech:eilya-chat-android:1.0.0")
+    implementation("com.eilyatech:eilya-chat-android:1.1.0")
 
     // Android
     implementation("androidx.core:core-ktx:1.12.0")

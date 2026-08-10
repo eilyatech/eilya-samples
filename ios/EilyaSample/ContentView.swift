@@ -57,9 +57,8 @@ struct ContentView: View {
 
                     if !otpStatus.isEmpty {
                         Text(otpStatus)
-                            .font(.caption)
+                            .font(.system(.caption, design: .monospaced))
                             .foregroundColor(.secondary)
-                            .fontDesign(.monospaced)
                     }
                 }
 
@@ -84,9 +83,8 @@ struct ContentView: View {
 
                     if !chatStatus.isEmpty {
                         Text(chatStatus)
-                            .font(.caption)
+                            .font(.system(.caption, design: .monospaced))
                             .foregroundColor(.secondary)
-                            .fontDesign(.monospaced)
                     }
                 }
             }
@@ -104,7 +102,7 @@ struct ContentView: View {
         otpStatus = "Sending OTP..."
 
         do {
-            let pipeline = try await EilyaOtp.shared.requestOTP(phone: phone)
+            let pipeline = try await EilyaOtp.shared.requestOTP(phoneNumber: phone)
             pipelineId = pipeline.pipelineId
             otpStatus = "OTP sent via \(pipeline.channelUsed)\nPipeline: \(pipeline.pipelineId)"
             showVerify = true
@@ -122,7 +120,7 @@ struct ContentView: View {
 
         do {
             let result = try await EilyaOtp.shared.verifyOTP(pipelineId: pid, otp: otpCode)
-            otpStatus = "Verified!\nToken: \(result.authToken)\nPhone: \(result.phone)"
+            otpStatus = "Verified successfully\nPhone: \(result.phone ?? "")"
         } catch {
             otpStatus = "Failed: \(error.localizedDescription)"
         }
@@ -159,11 +157,15 @@ struct ContentView: View {
 @main
 struct EilyaSampleApp: App {
     init() {
-        // Initialize Eilya OTP — replace with your API key
-        EilyaOtp.shared.configure(apiKey: "ek_test_your_api_key_here")
+        // Supply real values in the Xcode scheme environment; never commit them.
+        let environment = ProcessInfo.processInfo.environment
+        let otpApiKey = environment["EILYA_OTP_API_KEY"]
+            ?? "ek_test_000000000000000000000000000000000000000000000000"
+        let chatEmbedToken = environment["EILYA_CHAT_EMBED_TOKEN"]
+            ?? "ew_000000000000000000000000000000000000000000000000"
+        EilyaOtp.shared.configure(apiKey: otpApiKey)
 
-        // Initialize Eilya Chat — replace with your API key
-        EilyaChat.shared.configure(apiKey: "eck_test_your_api_key_here")
+        EilyaChat.shared.configure(embedToken: chatEmbedToken)
     }
 
     var body: some Scene {

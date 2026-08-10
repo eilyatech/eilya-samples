@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   eilya_otp: ^1.0.0
-  eilya_chat: ^1.0.0
+  eilya_chat: ^1.1.0
 
 flutter:
   uses-material-design: true

@@ -6,7 +6,7 @@ Sample apps demonstrating **Eilya OTP** and **Eilya Chat** SDKs across all platf
 
 | Directory | Platform | SDKs Used |
 |-----------|----------|-----------|
-| [`android/`](android/) | Android (Kotlin) | `com.eilyatech:eilya-otp-android:1.0.0` + `com.eilyatech:eilya-chat-android:1.0.0` |
+| [`android/`](android/) | Android (Kotlin) | `com.eilyatech:eilya-otp-android:1.0.0` + `com.eilyatech:eilya-chat-android:1.1.0` |
 | [`ios/`](ios/) | iOS (SwiftUI) | `EilyaOTP` + `EilyaChat` via Swift Package Manager |
 | [`flutter/`](flutter/) | Flutter (Dart) | `eilya_otp: ^1.0.0` + `eilya_chat: ^1.0.0` |
 
@@ -15,34 +15,38 @@ Sample apps demonstrating **Eilya OTP** and **Eilya Chat** SDKs across all platf
 ### 1. Get your API keys
 
 - **OTP API key**: [otp.eilyatech.com](https://otp.eilyatech.com)
-- **Chat API key**: [chat.eilyatech.com](https://chat.eilyatech.com)
+- **Chat widget embed token**: create/select a widget at [chat.eilyatech.com](https://chat.eilyatech.com)
 
-### 2. Replace placeholder keys
+### 2. Supply credentials without editing source
 
-In each sample app, find and replace:
-- `ek_test_your_api_key_here` → your Eilya OTP API key
-- `ec_test_your_api_key_here` → your Eilya Chat API key
+Use an OTP API key (`ek_test_...` or `ek_live_...`) and a public Chat widget embed token
+(`ew_...`). Never put a Chat management API key in a client app.
 
 ### 3. Run
 
 **Android:**
 ```bash
 cd android
-./gradlew installDebug
+gradle installDebug \
+  -PEILYA_OTP_API_KEY=ek_test_... \
+  -PEILYA_CHAT_EMBED_TOKEN=ew_...
 ```
 
 **iOS:**
 ```bash
 cd ios
 open Package.swift  # Opens in Xcode
-# Build & Run
+# Add EILYA_OTP_API_KEY and EILYA_CHAT_EMBED_TOKEN to the Run scheme environment.
+# Build & Run.
 ```
 
 **Flutter:**
 ```bash
 cd flutter
 flutter pub get
-flutter run
+flutter run \
+  --dart-define=EILYA_OTP_API_KEY=ek_test_... \
+  --dart-define=EILYA_CHAT_EMBED_TOKEN=ew_...
 ```
 
 ## SDK Documentation
@@ -57,7 +61,7 @@ flutter run
 ```kotlin
 dependencies {
     implementation("com.eilyatech:eilya-otp-android:1.0.0")
-    implementation("com.eilyatech:eilya-chat-android:1.0.0")
+    implementation("com.eilyatech:eilya-chat-android:1.1.0")
 }
 ```
 
@@ -70,7 +74,7 @@ In Xcode → File → Add Package Dependencies:
 ```yaml
 dependencies:
   eilya_otp: ^1.0.0
-  eilya_chat: ^1.0.0
+  eilya_chat: ^1.1.0
 ```
 
 ## License

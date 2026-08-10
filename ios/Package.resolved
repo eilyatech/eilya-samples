@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "eilya-chat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/eilyatech/eilya-chat.git",
+      "state" : {
+        "revision" : "ccbeec6167410205e21c6078c727d060ce7b4f52",
+        "version" : "1.1.0"
+      }
+    },
+    {
+      "identity" : "eilya-otp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/eilyatech/eilya-otp.git",
+      "state" : {
+        "revision" : "7ce91cde5b758f7c65c25c98ff0d2ab6e6f0f1a6",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}
